@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">My Android Application</string>
+    <string name="ip">IP:</string>
+    <string name="port">Port:</string>
+    <string name="connect">Connect</string>
+    <string name="enter_port">Enter Port</string>
+    <string name="enter_ip">Enter IP</string>
 </resources>
