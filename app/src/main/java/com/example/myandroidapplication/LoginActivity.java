@@ -17,7 +17,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Called when user taps the Send button
-    public void sendMessage(View view) {
+    public void openJoystick(View view) {
         EditText editIP = (EditText) findViewById(R.id.Edit_IP);
         EditText editPort = (EditText) findViewById(R.id.Edit_Port);
         Intent intent = new Intent(this, JoystickActivity.class);

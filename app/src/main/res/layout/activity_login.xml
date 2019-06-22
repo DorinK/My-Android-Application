@@ -76,6 +76,7 @@
         android:layout_width="125dp"
         android:layout_height="57dp"
         android:background="#AFB5DF"
+        android:onClick="openJoystick"
         android:text="@string/connect"
         android:textSize="18sp"
         android:textStyle="bold"
