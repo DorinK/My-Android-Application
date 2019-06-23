@@ -3,124 +3,172 @@ package com.example.myandroidapplication;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+/**
+ * Designing the Joystick visibility.
+ */
 public class JoystickView extends SurfaceView implements SurfaceHolder.Callback, View.OnTouchListener {
-    private JoystickListener joystick;
-    private float interiorRadius; // the interior radius
-    private float exteriorRadius; // the exterior radius
-    private float dy;
-    private float dx;
 
-    private float height() {
-        return (float) getHeight();
-    }
+    private static final float RADIUS = 1.3f;
 
-    private float width() {
-        return (float) getWidth();
-    }
+    private JoystickListener joystickCallback;
 
-    public JoystickView(Context theContext, AttributeSet attributes, int style) {
-        super(theContext, attributes, style);
+    float innerCircleRadius;
+    float outerCircleRadius;
+
+    // The x and y coordinates of the Joystick's knob.
+    float xKnob;
+    float yKnob;
+
+    boolean isPressedInBase = false;
+
+    /**
+     * Constructor of the JoystickView class.
+     *
+     * @param context derives the activity.
+     */
+    public JoystickView(Context context) {
+        super(context);
         getHolder().addCallback(this);
         setOnTouchListener(this);
-        if (theContext instanceof JoystickListener)
-            joystick = (JoystickListener) theContext;
-    }
-
-    public JoystickView(Context theContext, AttributeSet attributes) {
-        super(theContext, attributes);
-        getHolder().addCallback(this);
-        setOnTouchListener(this);
-        if (theContext instanceof JoystickListener)
-            joystick = (JoystickListener) theContext;
-    }
-
-    public JoystickView(Context theContext) {
-        super(theContext);
-        getHolder().addCallback(this);
-        setOnTouchListener(this);
-        if (theContext instanceof JoystickListener)
-            joystick = (JoystickListener) theContext;
-    }
-
-    private void drawJoystick(float newX, float newY) {
-        if (getHolder().getSurface().isValid()) {
-            Canvas thisCanvas = this.getHolder().lockCanvas();
-            Paint colors = new Paint();
-            thisCanvas.drawColor(0xff33b5e5);
-            //Draw the base first before shading
-            colors.setARGB(255, 192, 192, 192);
-            thisCanvas.drawCircle(dx, dy, exteriorRadius, colors);
-            //draw the handle
-            colors.setARGB(255, 0, 0, 0);
-            thisCanvas.drawCircle(newX, newY, interiorRadius, colors);
-            getHolder().unlockCanvasAndPost(thisCanvas);
+        if (context instanceof JoystickListener) {
+            this.joystickCallback = (JoystickListener) context;
         }
     }
 
+    /**
+     * Initialize the parameters according to the device's sizes.
+     */
+    void setupView() {
+        this.xKnob = (float) getWidth() / 2;
+        this.yKnob = (float) getHeight() / 2;
+        this.innerCircleRadius = (float) Math.min(getWidth(), getHeight()) / 3;
+        this.outerCircleRadius = (float) Math.min(getWidth(), getHeight()) / 10;
+    }
+
+    /**
+     * Draws the joystick base and the joystick knob according to given parameters which changes
+     * interactively by the user.
+     *
+     * @param newX the x axis of which joystick knob should be.
+     * @param newY the y axis of which joystick knob should be.
+     */
+    private void drawJoystick(float newX, float newY) {
+        if (getHolder().getSurface().isValid()) {
+            Canvas myCanvas = this.getHolder().lockCanvas();
+            Paint color = new Paint();
+            // Filling the background with the chosen color.
+            myCanvas.drawColor(0xFF67A6C7);
+            // Drawing the outer circle.
+            color.setARGB(255, 192, 192, 192);
+            myCanvas.drawCircle(this.xKnob, this.yKnob, this.innerCircleRadius, color);
+            // Drawing the inner circle - the Joystick's knob.
+            color.setARGB(255, 0, 0, 0);
+            myCanvas.drawCircle(newX, newY, this.outerCircleRadius, color);
+            getHolder().unlockCanvasAndPost(myCanvas);
+        }
+    }
+
+    /**
+     * Called immediately after the surface is first created.
+     *
+     * @param surfaceHolder the painter.
+     */
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        dx = width() / 2;
-        dy = height() / 2;
-        float min = Math.min(width(), height());
-        exteriorRadius = min / 3;
-        interiorRadius = min / 12;
-        drawJoystick(dx, dy);
+        // Setup the view and drawing the Joystick.
+        setupView();
+        drawJoystick(this.xKnob, this.yKnob);
     }
 
+    /**
+     * Updating the parameters according to the changes of the surface.
+     * Called immediately after any structural changes (format / size) have been made to the surface
+     *
+     * @param surfaceHolder the painter.
+     * @param format        the format.
+     * @param width         the width.
+     * @param height        the height.
+     */
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-        //not necessary for our needs
+        // Re setup of the view and drawing the Joystick.
+        setupView();
+        drawJoystick(this.xKnob, this.yKnob);
     }
 
+    /**
+     * Called immediately before a surface is being destroyed.
+     *
+     * @param surfaceHolder the painter.
+     */
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        //not necessary for our needs
     }
 
-    private float norm(float p, float cp) {
-        return (p - cp) / exteriorRadius;
-    }
+    /**
+     * Called when a touch event is dispatched to a view
+     *
+     * @param view        The view the touch event has been dispatched to.
+     * @param motionEvent The information about the event.
+     * @return True if the listener has consumed the event, false otherwise.
+     */
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        float displacement = (float) Math.sqrt(Math.pow(motionEvent.getX() - this.xKnob, 2)
+                + Math.pow(motionEvent.getY() - this.yKnob, 2));
+        float ratio = this.innerCircleRadius / displacement;
 
-    public boolean onTouch(View view, MotionEvent event) {
-        // when there is a touch in the screen
-        if (view.equals(this)) {
-            // check if there is a touch
-            if (event.getAction() != MotionEvent.ACTION_UP) {
-                float x = event.getX();
-                float y = event.getY();
-                // make sure joystick out of bounderies
-                float distance = (float) Math.sqrt((Math.pow(x - dx, 2)) + Math.pow(y - dy, 2));
-                if (distance < exteriorRadius) {
-                    // draw joystick
-                    drawJoystick(x, y);
-                    // notify listeners
-                    joystick.onJoystickMoved(norm(x, dx), norm(y, dy));
-                } else {
-                    // make sure the x and y are in the boundries
-                    float ratio = exteriorRadius / distance;
-                    float tx = dx + (x - dx) * ratio;  // bounded x
-                    float ty = dy + (x - dy) * ratio;
-                    drawJoystick(tx, ty);
-                    // notify listeners
-                    joystick.onJoystickMoved(norm(tx, dx), norm(ty, dy));
-                }
+        if (displacement < (this.innerCircleRadius / RADIUS)) {
+            this.isPressedInBase = true;
+
+            if (motionEvent.getAction() != MotionEvent.ACTION_UP) {
+                drawJoystick(motionEvent.getX(), motionEvent.getY());
+                this.joystickCallback.onJoystickMoved((motionEvent.getX()
+                        - this.xKnob) / this.innerCircleRadius, (motionEvent.getY()
+                        - this.yKnob) / this.innerCircleRadius);
             } else {
-                // if there is no touch, return joystick to the middle
-                drawJoystick(dx, dy);
-                joystick.onJoystickMoved(0, 0);
+                this.isPressedInBase = false;
+                drawJoystick(this.xKnob, this.yKnob);
+                this.joystickCallback.onJoystickMoved(0, 0);
+            }
+
+        } else {
+            if (this.isPressedInBase && motionEvent.getAction() != MotionEvent.ACTION_UP) {
+
+                float constrainedX = this.xKnob + (motionEvent.getX() - this.xKnob) * ratio / RADIUS;
+                float constrainedY = this.yKnob + (motionEvent.getY() - this.yKnob) * ratio / RADIUS;
+                drawJoystick(constrainedX, constrainedY);
+                this.joystickCallback.onJoystickMoved((constrainedX - this.xKnob)
+                                / this.innerCircleRadius * (RADIUS),
+                        (constrainedY - this.yKnob) / this.innerCircleRadius * (RADIUS));
+            }
+
+            if (this.isPressedInBase && motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                this.isPressedInBase = false;
+                drawJoystick(this.xKnob, this.yKnob);
+                this.joystickCallback.onJoystickMoved(0, 0);
             }
         }
         return true;
     }
 
-    // interface for the joystick's listeners
+    /**
+     * Functional interface.
+     * Allows to listen to the movement of the joystick's knob.
+     */
     public interface JoystickListener {
-        void onJoystickMoved(float x, float y);
+
+        /**
+         * Defines what happens when a movement is encountered.
+         *
+         * @param xCoordinate the x location of the knob
+         * @param yCoordinate the y location of the knob
+         */
+        void onJoystickMoved(float xCoordinate, float yCoordinate);
     }
 }

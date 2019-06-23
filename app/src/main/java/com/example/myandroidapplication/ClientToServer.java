@@ -5,90 +5,114 @@ import java.io.Writer;
 import java.net.InetAddress;
 import java.net.Socket;
 
-//a class to send commands to the server.
+/**
+ * Defines the connection to the server.
+ */
 public class ClientToServer {
+
+    // Constants.
+    private static final String SET_AILERON = "set /controls/flight/aileron ";
+    private static final String SET_ELEVATOR = "set /controls/flight/elevator ";
+    private static final String NEW_LINE = "\r\n";
+
     private Socket socket;
-    private Writer writer;
+    private Writer outStream;
     private float aileron;
     private float elevator;
-    private float changeTreshold;
 
+    /**
+     * Constructor of the ClientToServer class which establish the connection to the server.
+     *
+     * @param ip   the given IP address.
+     * @param port the given port.
+     */
     public ClientToServer(final String ip, final int port) {
-        changeTreshold = (float) 0.1;
-        aileron = 0;
-        elevator = 0;
+
+        // Default values.
+        this.aileron = 0;
+        this.elevator = 0;
+
+        // Making the connection to the server in a new thread.
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
 
-                    //here you must put your computer's IP address.
+                    // Extracting the IP address.
                     InetAddress serverAddr = InetAddress.getByName(ip);
-                    //create a socket to make the connection with the server
+                    // Creating the socket.
                     socket = new Socket(serverAddr, port);
 
                     try {
-                        //create a new writer
-
-                        writer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
-                        ;
-                        //handle exceptions.
+                        // Initializing the outStream.
+                        outStream = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
                     } catch (Exception e) {
                         System.out.println(e.toString());
                     }
+
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
-
             }
         });
-        //start the thread.
+
+        // Put the thread in the ready queue.
         t.start();
-        /// wait for the connection thread
+
+        // Making the thread wait to the main thread.
         try {
             t.join();
         } catch (Exception e) {
             System.out.println(e.toString());
         }
 
+    }
 
+    /**
+     * Updating the aileron value in the server.
+     *
+     * @param newVal the new value.
+     */
+    public void setAileron(float newVal) {
+        this.aileron = newVal;
+        String msg = SET_AILERON + newVal + NEW_LINE;
+        send(msg);
     }
-    //check if there was a difference between the former and current values.
-    private boolean diffrent(float a, float b) {
-        return Math.abs(a - b) > changeTreshold;
-    }
-    //set the aileron value.
-    public void setAileron(float val) {
-        if (diffrent(val, aileron)) {
-            aileron = val;
-            String msg = "set /controls/flight/aileron " + val + "\r\n";
-            send(msg);
-        }
-    }
-    //set the elevator value.
-    public void setElevator(float val) {
-        if (diffrent(val, elevator)) {
-            elevator = val;
-            String msg = "set /controls/flight/elevator " + val + "\r\n";
-            send(msg);
-        }
 
+    /**
+     * Updating the elevator value in the server.
+     *
+     * @param newVal the new value.
+     */
+    public void setElevator(float newVal) {
+        this.elevator = newVal;
+        String msg = SET_ELEVATOR + newVal + NEW_LINE;
+        send(msg);
     }
-    //a function to send a command to the server.
+
+    /**
+     * Sending the new value to the server.
+     *
+     * @param str the command to send to the server.
+     */
     public void send(final String str) {
-        //send the command in a new thread.
+
+        // Send the new value in a new thread.
         Thread t = new Thread(new Runnable() {
 
             public void run() {
                 try {
-                    writer.write(str);
-                    writer.flush();
+                    outStream.write(str);
+                    outStream.flush();
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
             }
         });
+
+        // Put the thread in the ready queue.
         t.start();
-        //wait for the thread to finish.
+
+        // Making the thread wait to the main thread.
         try {
             t.join();
         } catch (Exception e) {
@@ -97,5 +121,19 @@ public class ClientToServer {
 
     }
 
+    /**
+     * Closing the socket.
+     */
+    public void close() {
 
-} // end of object}
+        // Making it in a new thread.
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    socket.close();
+                } catch (Exception e) {
+                }
+            }
+        }).start();
+    }
+}

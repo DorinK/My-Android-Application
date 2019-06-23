@@ -7,16 +7,27 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+/**
+ * Defining the LoginActivity.
+ */
 public class LoginActivity extends AppCompatActivity {
 
+    /***
+     * Creating the activity and defining it's view.
+     *
+     * @param savedInstanceState    the savedInstanceState.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
     }
 
-
-    // Called when user taps the Send button
+    /**
+     * Defines the followed actions when the user taps on the Connect button.
+     *
+     * @param view the view.
+     */
     public void openJoystick(View view) {
         EditText editIP = (EditText) findViewById(R.id.Edit_IP);
         EditText editPort = (EditText) findViewById(R.id.Edit_Port);

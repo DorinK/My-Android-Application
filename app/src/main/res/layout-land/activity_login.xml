@@ -11,6 +11,7 @@
         android:id="@+id/Edit_Port"
         android:layout_width="353dp"
         android:layout_height="48dp"
+        android:layout_marginTop="8dp"
         android:background="@android:color/white"
         android:ems="10"
         android:hint="@string/enter_port"
@@ -19,13 +20,14 @@
         app:layout_constraintHorizontal_bias="0.756"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        app:layout_constraintTop_toBottomOf="@+id/Edit_IP"
+        app:layout_constraintVertical_bias="0.183" />
 
     <EditText
         android:id="@+id/Edit_IP"
         android:layout_width="356dp"
         android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
         android:background="@android:color/white"
         android:ems="10"
         android:hint="@string/enter_ip"
@@ -35,7 +37,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.212" />
+        app:layout_constraintVertical_bias="0.236" />
 
     <TextView
         android:id="@+id/textView7"
@@ -43,6 +45,10 @@
         android:layout_height="29dp"
         android:layout_marginStart="120dp"
         android:layout_marginLeft="120dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/ip"
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -50,10 +56,12 @@
         android:textSize="24sp"
         android:textStyle="normal|bold"
         android:typeface="normal"
-        app:layout_constraintBottom_toBottomOf="@+id/Edit_IP"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/Edit_IP"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Edit_IP"
-        app:layout_constraintVertical_bias="0.555" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.232" />
 
     <TextView
         android:id="@+id/textView9"
@@ -61,6 +69,10 @@
         android:layout_height="29dp"
         android:layout_marginStart="120dp"
         android:layout_marginLeft="120dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/port"
         android:textAlignment="center"
         android:textAllCaps="false"
@@ -68,15 +80,18 @@
         android:textSize="24sp"
         android:textStyle="normal|bold"
         android:typeface="normal"
-        app:layout_constraintBottom_toBottomOf="@+id/Edit_Port"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/Edit_Port"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Edit_Port" />
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        app:layout_constraintVertical_bias="0.25" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="125dp"
         android:layout_height="57dp"
-        android:background="#AFB5DF"
+        android:background="#BE8F96"
         android:onClick="openJoystick"
         android:text="@string/connect"
         android:textSize="18sp"

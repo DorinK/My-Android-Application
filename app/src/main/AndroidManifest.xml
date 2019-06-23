@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".JoystickActivity"
+            android:configChanges="orientation"
             android:parentActivityName=".LoginActivity"></activity>
         <activity android:name=".LoginActivity">
             <intent-filter>
